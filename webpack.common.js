@@ -57,7 +57,7 @@ module.exports = {
       chunkFilename: "[id].css",
     }),
     new CopyWebpackPlugin({
-      patterns: [{ from: "images", to: "images" }],
+      patterns: [{ from: "./images/error.jpg", to: "error.jpg" }],
     }),
   ],
 };

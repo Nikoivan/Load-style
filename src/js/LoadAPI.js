@@ -4,6 +4,8 @@ export default class LoadAPI {
 
     this.init = this.init.bind(this);
 
+    this.showError = this.showError.bind(this);
+
     document.addEventListener("DOMContentLoaded", this.init);
   }
 
@@ -27,58 +29,89 @@ export default class LoadAPI {
   createLoadElement() {
     const element = document.createElement("div");
     element.classList.add("load-wrapper");
-    element.innerHTML = `<div class="load-header">
-    <div class="load-title-wrap"><h2 class="load-title">Новости мира кино</h2></div>
-    <div class="load-update-wrape"><a href="#" class="update-btn">Обновить</a></div>
-</div>
-<div class="loader-main">
-    <div class="loader-plug-wrap">
-        <div class="fake-load-item">
-            <div class="fake-item-load-header">
-                <span class="fake-load-title"></span>
-            </div>
-            <div class="fake-item-load-main">
-                <div class="fake-item-image-wrap">
-                    <span class="fake-item-image"></span>
+    element.innerHTML = `<div class="temp-wrap"><div class="load-header">
+        <div class="load-title-wrap"><h2 class="load-title">Новости мира кино</h2></div>
+        <div class="load-update-wrape"><a href="#" class="update-btn">Обновить</a></div>
+    </div>
+    <div class="loader-main">
+        <div class="loader-plug-wrap">
+            <div class="fake-load-item">
+                <div class="fake-item-load-header">
+                    <span class="fake-load-title"></span>
                 </div>
-                <div class="fake-item-content-wrap">
-                    <span class="fake-content-row"></span>
-                    <span class="fake-content-row"></span>
-                </div>
-            </div>
-        </div>
-        <div class="fake-load-item">
-            <div class="fake-item-load-header">
-                <span class="fake-load-title"></span>
-            </div>
-            <div class="fake-item-load-main">
-                <div class="fake-item-image-wrap">
-                    <span class="fake-item-image"></span>
-                </div>
-                <div class="fake-item-content-wrap">
-                    <span class="fake-content-row"></span>
-                    <span class="fake-content-row"></span>
+                <div class="fake-item-load-main">
+                    <div class="fake-item-image-wrap">
+                        <span class="fake-item-image"></span>
+                    </div>
+                    <div class="fake-item-content-wrap">
+                        <span class="fake-content-row"></span>
+                        <span class="fake-content-row"></span>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="fake-load-item">
-            <div class="fake-item-load-header">
-                <span class="fake-load-title"></span>
-            </div>
-            <div class="fake-item-load-main">
-                <div class="fake-item-image-wrap">
-                    <span class="fake-item-image"></span>
+            <div class="fake-load-item">
+                <div class="fake-item-load-header">
+                    <span class="fake-load-title"></span>
                 </div>
-                <div class="fake-item-content-wrap">
-                    <span class="fake-content-row"></span>
-                    <span class="fake-content-row"></span>
+                <div class="fake-item-load-main">
+                    <div class="fake-item-image-wrap">
+                        <span class="fake-item-image"></span>
+                    </div>
+                    <div class="fake-item-content-wrap">
+                        <span class="fake-content-row"></span>
+                        <span class="fake-content-row"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="fake-load-item">
+                <div class="fake-item-load-header">
+                    <span class="fake-load-title"></span>
+                </div>
+                <div class="fake-item-load-main">
+                    <div class="fake-item-image-wrap">
+                        <span class="fake-item-image"></span>
+                    </div>
+                    <div class="fake-item-content-wrap">
+                        <span class="fake-content-row"></span>
+                        <span class="fake-content-row"></span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>`;
+    </div>`;
 
+    const loadElement = document.createElement("img");
+    loadElement.classList.add("load-image");
+    loadElement.setAttribute("src", "http://localhost:7070/netology.jpg");
+
+    this.tempEl = element.querySelector(".temp-wrap");
     this.element = element;
     this.container.append(element);
+
+    this.bindToLoadEl(loadElement);
+  }
+
+  bindToLoadEl(element) {
+    element.addEventListener("error", this.showError);
+    element.addEventListener("load", () => {
+      this.reRenderDOM(element);
+    });
+  }
+
+  reRenderDOM(element) {
+    this.tempEl.remove();
+    this.element.append(element);
+  }
+
+  showError() {
+    this.element.innerHTML = `<div class="error-wrap">
+    <p class="error-text-first">
+        Не удалось загрузить данные                
+    </p>
+    <p class="error-text-second">
+        Проверьте подключение и обновите страницу
+    </p>
+  </div>`;
   }
 }

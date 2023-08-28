@@ -1,34 +1,46 @@
 const staticCacheName = "load-cache-v1";
 
-const assetUrls = ["index.html", "style.css", "index.js", "/images/user.png"];
+const assetUrls = ["/", "/index.html", "/index.js", "/style.css", "/error.jpg"];
 
 self.addEventListener("install", async (e) => {
-  console.log("installed");
+  console.log("install");
   const cache = await caches.open(staticCacheName);
-  await cache.addAll(assetUrls);
+  await cache.addAll([
+    "./",
+    "./index.html",
+    "./index.js",
+    "./style.css",
+    "./error.jpg",
+  ]);
 });
 
 self.addEventListener("activate", async (e) => {
   console.log("activated");
 
-  /*const cacheNames = await caches.keys();
+  const cacheNames = await caches.keys();
 
   await Promise.all(
     cacheNames
       .filter((name) => name !== staticCacheName)
-      .map((name) => caches.delete(name))
-  );*/
+      .map((name) => caches.delete(name)),
+  );
 });
 
 self.addEventListener("fetch", async (e) => {
-  console.log("fetch");
+  if (e.type === "error") {
+    console.log("error");
+    return;
+  }
 
   const url = new URL(e.request.url);
 
-  if (staticCacheName.includes(url.pathname)) {
-    console.log("2");
+  if (assetUrls.includes(url.pathname)) {
     e.respondWith(networkFirst(e.request));
+    return;
+  }
 
+  if (url.pathname.endsWith(".jpg")) {
+    e.respondWith(imageFetchFirst(e.request));
     return;
   }
 
@@ -36,7 +48,6 @@ self.addEventListener("fetch", async (e) => {
 });
 
 async function cacheFirst(request) {
-  console.log(request);
   const cached = await caches.match(request);
 
   if (cached) {
@@ -58,7 +69,6 @@ async function cacheFirst(request) {
 }
 
 async function networkFirst(request) {
-  console.log(request);
   let response;
 
   try {
@@ -70,5 +80,22 @@ async function networkFirst(request) {
       return cacheResponse;
     }
   }
-  return;
+  const cache = await caches.open(staticCacheName);
+  cache.put(request, response.clone());
+
+  return response;
+}
+
+async function imageFetchFirst(request) {
+  let response;
+
+  try {
+    response = await fetch(request);
+  } catch (err) {
+    return await caches.match("./error.jpg");
+  }
+  const cache = await caches.open(staticCacheName);
+  cache.put(request, response.clone());
+
+  return response;
 }
